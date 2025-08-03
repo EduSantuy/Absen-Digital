@@ -55,10 +55,10 @@
         .action-buttons {display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 30px;}
         .action-button {padding: 15px 20px; border-radius: 15px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s; font-family: 'Poppins', sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
         .action-button:hover {transform: translateY(-3px); box-shadow: 0 6px 10px rgba(0,0,0,0.15);}
-        .daily-report {background-color: var(--yellow-pastel);}
-        .monthly-report {background-color: var(--pink-pastel);}
         .present-all {background-color: var(--green-pastel);}
         .submit-attendance {background-color: var(--blue-pastel);}
+        .rekap-harian {background-color: var(--yellow-pastel);}
+        .rekap-bulanan {background-color: var(--pink-pastel);}
         .students-grid {display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;}
         @media (min-width: 576px) {.students-grid {grid-template-columns: repeat(3, 1fr);}}
         @media (min-width: 768px) {.students-grid {grid-template-columns: repeat(4, 1fr);}}
@@ -70,6 +70,17 @@
         .student-name {font-size: 14px; font-weight: 600; margin-bottom: 10px; min-height: 40px; display: flex; align-items: center; justify-content: center;}
         .attendance-status {width: 100%; padding: 8px; border-radius: 10px; border: 2px solid var(--blue-pastel); font-size: 14px; font-weight: 600; cursor: pointer;}
         .success-message {position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #2ecc71; color: white; padding: 15px 30px; border-radius: 10px; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); z-index: 1000; display: none;}
+        /* Rekap modal */
+        .modal {display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.2);z-index:2000;align-items:center;justify-content:center;}
+        .modal.active {display:flex;}
+        .modal-content {background:#fff;padding:30px 20px;border-radius:16px;min-width:340px;max-width:95vw;max-height:90vh;overflow:auto;box-shadow:0 10px 30px var(--shadow);}
+        .modal-content h2 {font-size:22px;font-weight:800;text-align:center;margin-bottom:18px;}
+        .modal-content .close-modal {position:absolute;top:18px;right:22px;font-size:22px;cursor:pointer;color:#333;}
+        .rekap-table {width:100%;border-collapse:collapse;margin-top:10px;}
+        .rekap-table th, .rekap-table td {border:1px solid #eee;padding:7px;font-size:14px;text-align:left;}
+        .rekap-table th {background:#f9f9f9;}
+        .rekap-controls {margin-bottom:10px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+        .rekap-controls input, .rekap-controls select {padding:6px 10px;border-radius:8px;border:1px solid #ddd;}
     </style>
 </head>
 <body>
@@ -81,15 +92,15 @@
         </div>
         <!-- Login Page -->
         <div id="login-page" class="slide-container active">
-            <form class="login-form" id="loginForm">
+            <form class="login-form" id="loginForm" autocomplete="off">
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="lita" required>
+                    <input type="text" id="username" required autocomplete="off">
                 </div>
                 <div class="form-group password-container">
                     <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="kelas5" required>
-                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword()"></i>
+                    <input type="password" id="password" required autocomplete="off">
+                    <i class="fas fa-eye-slash toggle-password" id="togglePasswordBtn" tabindex="0" aria-label="Tampilkan/sembunyikan password"></i>
                 </div>
                 <button type="submit" class="login-button">
                     <i class="fas fa-lock"></i> Login
@@ -107,17 +118,30 @@
                 <div class="digital-clock" id="digital-clock">00:00:00</div>
             </div>
             <div class="action-buttons">
-                <button class="action-button present-all" onclick="markAllPresent()">
+                <button class="action-button present-all" id="btnHadirSemua">
                     <i class="fas fa-user-check"></i> Hadir Semua
                 </button>
-                <button class="action-button submit-attendance" onclick="submitAttendance()">
+                <button class="action-button submit-attendance" id="btnKirimAbsen">
                     <i class="fas fa-paper-plane"></i> Kirim Absen
+                </button>
+                <button class="action-button rekap-harian" id="btnRekapHarian">
+                    <i class="fas fa-calendar-day"></i> Rekap Harian
+                </button>
+                <button class="action-button rekap-bulanan" id="btnRekapBulanan">
+                    <i class="fas fa-calendar"></i> Rekap Bulanan
                 </button>
             </div>
             <div class="students-grid" id="students-container"></div>
         </div>
         <div id="success-message" class="success-message">
             Data telah terkirim!
+        </div>
+        <!-- Modal Rekap -->
+        <div class="modal" id="rekapModal">
+            <div class="modal-content" id="rekapModalContent">
+                <span class="close-modal" id="closeRekapModal">&times;</span>
+                <!-- Rekap content will be injected here -->
+            </div>
         </div>
     </div>
     <script>
@@ -142,20 +166,43 @@
             updateDateTime();
             setInterval(updateDateTime, 1000);
             generateStudentCards();
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
+
+            // Login Form
+            const loginForm = document.getElementById('loginForm');
+            const errorMsg = document.getElementById('error-message');
+            loginForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
                 if (username === 'lita' && password === 'kelas5') {
                     showSlide('home-page');
+                    errorMsg.style.display = 'none';
                 } else {
-                    document.getElementById('error-message').style.display = 'block';
+                    errorMsg.style.display = 'block';
                 }
             });
+            document.getElementById('username').addEventListener('input', () => errorMsg.style.display='none');
+            document.getElementById('password').addEventListener('input', () => errorMsg.style.display='none');
+            document.getElementById('togglePasswordBtn').addEventListener('click', togglePassword);
+            document.getElementById('togglePasswordBtn').addEventListener('keypress', function(e) {
+                if (e.key === "Enter" || e.key === " ") togglePassword();
+            });
+
+            document.getElementById('btnHadirSemua').addEventListener('click', markAllPresent);
+            document.getElementById('btnKirimAbsen').addEventListener('click', submitAttendance);
+
+            // Rekap Harian & Bulanan
+            document.getElementById('btnRekapHarian').addEventListener('click', showRekapHarian);
+            document.getElementById('btnRekapBulanan').addEventListener('click', showRekapBulanan);
+            document.getElementById('closeRekapModal').addEventListener('click', closeRekapModal);
+            document.getElementById('rekapModal').addEventListener('click', function(e){
+                if(e.target === this) closeRekapModal();
+            });
         });
+
         function togglePassword() {
             const passwordInput = document.getElementById('password');
-            const icon = document.querySelector('.toggle-password');
+            const icon = document.getElementById('togglePasswordBtn');
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
@@ -184,20 +231,26 @@
                 if (!attendanceData[student]) attendanceData[student] = 'Hadir';
                 const card = document.createElement('div');
                 card.className = 'student-card';
+                const select = document.createElement('select');
+                select.className = 'attendance-status';
+                statusOptions.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.text;
+                    if (attendanceData[student] === opt.value) option.selected = true;
+                    select.appendChild(option);
+                });
+                select.addEventListener('change', function() { updateAttendance(student, select.value); });
                 card.innerHTML = `
                     <div class="student-avatar">${getInitials(student)}</div>
                     <div class="student-name">${student}</div>
-                    <select class="attendance-status" onchange="updateAttendance('${student}', this.value)">
-                        ${statusOptions.map(opt => `
-                            <option value="${opt.value}" ${attendanceData[student] === opt.value ? 'selected' : ''}>${opt.text}</option>
-                        `).join('')}
-                    </select>
                 `;
+                card.appendChild(select);
                 container.appendChild(card);
             });
         }
         function getInitials(name) {
-            return name.split(' ').map(part => part[0]).join('').substring(0,2);
+            return name.split(' ').map(part => part[0]).join('').substring(0,2).toUpperCase();
         }
         function updateAttendance(student, status) {
             attendanceData[student] = status;
@@ -206,35 +259,53 @@
             students.forEach(student => {attendanceData[student] = 'Hadir';});
             generateStudentCards();
         }
-        // Format date to DD-MM-YYYY
         function formatDate(date) {
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
             return `${day}-${month}-${year}`;
         }
-        // SUBMIT ABSENSI ke Google Sheet
         async function submitAttendance() {
             const today = formatDate(new Date());
-            let sukses = 0, gagal = 0;
-            for (const nama of students) {
-                const statusKehadiran = attendanceData[nama] || 'Alfa';
-                const data = {
-                    Tanggal: today,
-                    "Nama Siswa": nama,
-                    "Status Kehadiran": statusKehadiran
-                };
-                try {
-                    const res = await fetch("https://sheetdb.io/api/v1/a1efep9bi7ey2", {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({ data })
-                    });
-                    if (res.ok) sukses++; else gagal++;
-                } catch (e) {gagal++;}
-            }
-            // Tampilkan pesan
+            const dataArr = students.map(nama => ({
+                Tanggal: today,
+                "Nama Siswa": nama,
+                "Status Kehadiran": attendanceData[nama] || 'Alfa'
+            }));
             const message = document.getElementById('success-message');
+            let sukses = 0, gagal = 0;
+            try {
+                const res = await fetch("https://sheetdb.io/api/v1/a1efep9bi7ey2", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ data: dataArr })
+                });
+                if (res.ok) {
+                    sukses = students.length;
+                } else {
+                    gagal = students.length;
+                }
+            } catch (e) {
+                gagal = students.length;
+            }
+            if (sukses === 0) {
+                sukses = 0; gagal = 0;
+                for (const nama of students) {
+                    const data = {
+                        Tanggal: today,
+                        "Nama Siswa": nama,
+                        "Status Kehadiran": attendanceData[nama] || 'Alfa'
+                    };
+                    try {
+                        const res = await fetch("https://sheetdb.io/api/v1/a1efep9bi7ey2", {
+                            method: "POST",
+                            headers: {"Content-Type": "application/json"},
+                            body: JSON.stringify({ data })
+                        });
+                        if (res.ok) sukses++; else gagal++;
+                    } catch (e) {gagal++;}
+                }
+            }
             if (sukses > 0 && gagal === 0) {
                 message.textContent = 'Semua absensi berhasil dikirim!';
             } else if (sukses > 0) {
@@ -244,6 +315,151 @@
             }
             message.style.display = 'block';
             setTimeout(()=>{message.style.display='none';},3000);
+        }
+
+        // Modal Rekap
+        function showRekapModal(contentHTML) {
+            document.getElementById('rekapModalContent').innerHTML = '<span class="close-modal" id="closeRekapModal">&times;</span>' + contentHTML;
+            document.getElementById('rekapModal').classList.add('active');
+            document.getElementById('closeRekapModal').addEventListener('click', closeRekapModal);
+        }
+        function closeRekapModal() {
+            document.getElementById('rekapModal').classList.remove('active');
+        }
+
+        // Rekap Harian
+        function showRekapHarian() {
+            let todayStr = formatDate(new Date());
+            let dateInputHTML = `<div class="rekap-controls">
+                <label for="rekapTanggal"><b>Pilih Tanggal:</b></label>
+                <input type="date" id="rekapTanggal" value="${getDateInputValue(new Date())}">
+                <button id="btnCariRekapHarian" style="margin-left:8px;padding:7px 15px;border-radius:8px;border:none;background:var(--blue-pastel);font-weight:600;cursor:pointer;">Tampilkan</button>
+            </div>
+            <div id="rekapHarianResult"></div>`;
+            showRekapModal(`<h2>Rekap Harian</h2>${dateInputHTML}`);
+            document.getElementById('btnCariRekapHarian').addEventListener('click', function(){
+                let tanggal = document.getElementById('rekapTanggal').value;
+                if (tanggal) {
+                    let [year, month, day] = tanggal.split('-');
+                    let tanggalFormat = `${day}-${month}-${year}`;
+                    loadRekapHarian(tanggalFormat);
+                }
+            });
+            // Load default hari ini
+            loadRekapHarian(todayStr);
+        }
+        function getDateInputValue(date) {
+            // Format yyyy-mm-dd for input type="date"
+            let yyyy = date.getFullYear();
+            let mm = String(date.getMonth()+1).padStart(2,'0');
+            let dd = String(date.getDate()).padStart(2,'0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+        async function loadRekapHarian(tanggal) {
+            let resultDiv = document.getElementById('rekapHarianResult');
+            resultDiv.innerHTML = "Memuat data...";
+            // Ambil data dari SheetDB
+            try {
+                let res = await fetch(`https://sheetdb.io/api/v1/a1efep9bi7ey2/search?Tanggal=${encodeURIComponent(tanggal)}`);
+                let data = await res.json();
+                if (!Array.isArray(data) || data.length === 0) {
+                    resultDiv.innerHTML = `<div style="text-align:center;margin-top:15px;">Tidak ada data absensi untuk tanggal <b>${tanggal}</b></div>`;
+                    return;
+                }
+                let html = `<table class="rekap-table"><thead>
+                    <tr><th>Nama Siswa</th><th>Status Kehadiran</th></tr>
+                </thead><tbody>`;
+                for (let row of data) {
+                    html += `<tr>
+                        <td>${row["Nama Siswa"] || "-"}</td>
+                        <td>${row["Status Kehadiran"] || "-"}</td>
+                    </tr>`;
+                }
+                html += "</tbody></table>";
+                resultDiv.innerHTML = html;
+            } catch(e) {
+                resultDiv.innerHTML = `<div style="color:red">Gagal memuat data</div>`;
+            }
+        }
+
+        // Rekap Bulanan
+        function showRekapBulanan() {
+            let now = new Date();
+            let thisMonth = String(now.getMonth()+1).padStart(2,'0');
+            let thisYear = now.getFullYear();
+            let bulanInputHTML = `<div class="rekap-controls">
+                <label for="rekapBulan"><b>Pilih Bulan:</b></label>
+                <select id="rekapBulan">
+                    ${getBulanOptions(thisMonth)}
+                </select>
+                <label for="rekapTahun"><b>Tahun:</b></label>
+                <input type="number" id="rekapTahun" min="2023" max="${thisYear}" value="${thisYear}" style="width:90px;">
+                <button id="btnCariRekapBulanan" style="margin-left:8px;padding:7px 15px;border-radius:8px;border:none;background:var(--pink-pastel);font-weight:600;cursor:pointer;">Tampilkan</button>
+            </div>
+            <div id="rekapBulananResult"></div>`;
+            showRekapModal(`<h2>Rekap Bulanan</h2>${bulanInputHTML}`);
+            document.getElementById('btnCariRekapBulanan').addEventListener('click', function(){
+                let bulan = document.getElementById('rekapBulan').value;
+                let tahun = document.getElementById('rekapTahun').value;
+                loadRekapBulanan(bulan, tahun);
+            });
+            // Load default bulan ini
+            loadRekapBulanan(thisMonth, thisYear);
+        }
+        function getBulanOptions(selected) {
+            const bulanArr = [
+                "01|Januari", "02|Februari", "03|Maret", "04|April", "05|Mei", "06|Juni",
+                "07|Juli", "08|Agustus", "09|September", "10|Oktober", "11|November", "12|Desember"
+            ];
+            return bulanArr.map(b => {
+                let [val, label] = b.split('|');
+                return `<option value="${val}" ${val===selected?'selected':''}>${label}</option>`;
+            }).join('');
+        }
+        async function loadRekapBulanan(bulan, tahun) {
+            let resultDiv = document.getElementById('rekapBulananResult');
+            resultDiv.innerHTML = "Memuat data...";
+            // Ambil data dari SheetDB
+            try {
+                let res = await fetch(`https://sheetdb.io/api/v1/a1efep9bi7ey2/search_or?Tanggal=*-${bulan}-${tahun}`);
+                let data = await res.json();
+                if (!Array.isArray(data) || data.length === 0) {
+                    resultDiv.innerHTML = `<div style="text-align:center;margin-top:15px;">Tidak ada data absensi untuk bulan <b>${bulan}-${tahun}</b></div>`;
+                    return;
+                }
+                // Rekap per siswa
+                let siswaMap = {};
+                for (let row of data) {
+                    let nama = row["Nama Siswa"];
+                    let status = row["Status Kehadiran"];
+                    let tanggal = row["Tanggal"];
+                    if (!siswaMap[nama]) siswaMap[nama] = [];
+                    siswaMap[nama].push({tanggal, status});
+                }
+                let html = `<table class="rekap-table"><thead>
+                    <tr><th>Nama Siswa</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alfa</th></tr>
+                </thead><tbody>`;
+                for (let nama of Object.keys(siswaMap)) {
+                    let hadir=0, izin=0, sakit=0, alfa=0;
+                    for (let log of siswaMap[nama]) {
+                        if (log.status==="Hadir") hadir++;
+                        else if (log.status==="Izin") izin++;
+                        else if (log.status==="Sakit") sakit++;
+                        else alfa++;
+                    }
+                    html += `<tr>
+                        <td>${nama}</td>
+                        <td>${hadir}</td>
+                        <td>${izin}</td>
+                        <td>${sakit}</td>
+                        <td>${alfa}</td>
+                    </tr>`;
+                }
+                html += "</tbody></table>";
+                resultDiv.innerHTML = html;
+            } catch(e) {
+                resultDiv.innerHTML = `<div style="color:red">Gagal memuat data</div>`;
+            }
         }
     </script>
 </body>
