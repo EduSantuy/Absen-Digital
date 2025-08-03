@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absen Digital - SDN 1 Pasirpogor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --blue-pastel: #a0d2eb;
+            --yellow-pastel: #fde8a0;
+            --green-pastel: #c1e1c1;
+            --pink-pastel: #f9c5d1;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --text-dark: #333333;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--blue-pastel);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow);
+            overflow: hidden;
+            position: relative;
+            min-height: 85vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--blue-pastel), var(--green-pastel));
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background-color: var(--yellow-pastel);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            color: #f39c12;
+            box-shadow: 0 4px 10px var(--shadow);
+        }
+
+        .school-name {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        /* Slide Container */
+        .slide-container {
+            display: none;
+            padding: 20px;
+            min-height: 65vh;
+        }
+
+        .slide-container.active {
+            display: block;
+        }
+
+        /* Login Page */
+        .login-form {
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: var(--light-gray);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--blue-pastel);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .form-group input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--blue-pastel);
+            color: var(--text-dark);
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .login-button:hover {
+            background-color: #8bc6e0;
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Home Page */
+        .date-display {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #555;
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .digital-clock {
+            font-size: 32px;
+            font-weight: 800;
+            margin-top: 10px;
+            background: linear-gradient(45deg, var(--blue-pastel), var(--green-pastel));
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: var(--text-dark);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: inline-block;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-button {
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+        }
+
+        .daily-report {
+            background-color: var(--yellow-pastel);
+        }
+
+        .monthly-report {
+            background-color: var(--pink-pastel);
+        }
+
+        .present-all {
+            background-color: var(--green-pastel);
+        }
+
+        .submit-attendance {
+            background-color: var(--blue-pastel);
+        }
+
+        /* Students Grid */
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (min-width: 576px) {
+            .students-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .students-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .students-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .students-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        .student-card {
+            background-color: var(--light-gray);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px var(--shadow);
+        }
+
+        .student-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--blue-pastel);
+            margin: 0 auto 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .student-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .attendance-status {
+            width: 100%;
+            padding: 8px;
+            border-radius: 10px;
+            border: 2px solid var(--blue-pastel);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Report Pages */
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .date-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .date-filter select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid var(--blue-pastel);
+            font-size: 14px;
+            min-width: 100px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .summary-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .summary-card {
+            padding: 12px 15px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .summary-card h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .summary-card .count {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .present-card {
+            background-color: var(--green-pastel);
+        }
+
+        .permit-card {
+            background-color: var(--yellow-pastel);
+        }
+
+        .sick-card {
+            background-color: var(--blue-pastel);
+        }
+
+        .absent-card {
+            background-color: var(--pink-pastel);
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .report-table th {
+            background-color: var(--blue-pastel);
+            font-weight: 700;
+        }
+
+        .report-table tr:hover {
+            background-color: #f5f9ff;
+        }
+
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
+        }
+
+        @keyframes slideIn {
+            from { top: -50px; opacity: 0; }
+            to { top: 20px; opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        /* Backup Section */
+        .backup-section {
+            background-color: var(--light-gray);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+        
+        .backup-section h2 {
+            margin-bottom: 15px;
+            text-align: center;
+            color: #2c3e50;
+            font-size: 20px;
+        }
+        
+        .backup-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .backup-button {
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .backup-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .save-backup {
+            background-color: var(--green-pastel);
+        }
+        
+        .load-backup {
+            background-color: var(--blue-pastel);
+        }
+        
+        .restore-default {
+            background-color: var(--yellow-pastel);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-school"></i>
+            </div>
+            <h1 class="school-name">SDN 1 PASIRPOGOR</h1>
+            <p class="subtitle">DAFTAR HADIR SISWA</p>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login-page" class="slide-container active">
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="lita" required>
+                </div>
+                <div class="form-group password-container">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="kelas5" required>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword()"></i>
+                </div>
+                <button type="submit" class="login-button">
+                    <i class="fas fa-lock"></i> Login
+                </button>
+                <div id="error-message" class="error-message">
+                    Username atau Password salah!
+                </div>
+            </form>
+            <div class="footer">
+                © SDN 1 Pasirpogor
+            </div>
+        </div>
+
+        <!-- Home Page -->
+        <div id="home-page" class="slide-container">
+            <div class="date-display">
+                <i class="fas fa-calendar-alt"></i> <span id="current-date"></span>
+                <div class="digital-clock" id="digital-clock">00:00:00</div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-button present-all" onclick="markAllPresent()">
+                    <i class="fas fa-user-check"></i> Hadir Semua
+                </button>
+                <button class="action-button daily-report" onclick="showSlide('daily-report-page')">
+                    <i class="fas fa-users"></i> Rekap Harian
+                </button>
+                <button class="action-button monthly-report" onclick="showSlide('monthly-report-page')">
+                    <i class="fas fa-envelope"></i> Rekap Bulanan
+                </button>
+                <button class="action-button submit-attendance" onclick="submitAttendance()">
+                    <i class="fas fa-paper-plane"></i> Kirim Absen
+                </button>
+            </div>
+            
+            <div class="students-grid" id="students-container">
+                <!-- Student cards will be generated by JavaScript -->
+            </div>
+            
+            <!-- Backup Section -->
+            <div class="backup-section">
+                <h2><i class="fas fa-database"></i> Backup Data</h2>
+                <div class="backup-actions">
+                    <button class="backup-button save-backup" onclick="saveBackup()">
+                        <i class="fas fa-save"></i> Simpan Backup
+                    </button>
+                    <div class="file-input-wrapper">
+                        <button class="backup-button load-backup">
+                            <i class="fas fa-folder-open"></i> Pulihkan Backup
+                        </button>
+                        <input type="file" id="backup-file" accept=".json" onchange="loadBackup(this)">
+                    </div>
+                    <button class="backup-button restore-default" onclick="restoreDefaultData()">
+                        <i class="fas fa-undo"></i> Data Default
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Report Page -->
+        <div id="daily-report-page" class="slide-container">
+            <div class="report-header">
+                <button class="backup-button save-backup" onclick="showSlide('home-page')">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </button>
+                <div class="date-filter">
+                    <input type="date" id="daily-date" class="input-field">
+                </div>
+            </div>
+            
+            <h2>Rekap Kehadiran Harian</h2>
+            
+            <div class="summary-cards">
+                <div class="summary-card present-card">
+                    <h3>Hadir</h3>
+                    <div class="count" id="present-count">0</div>
+                </div>
+                <div class="summary-card permit-card">
+                    <h3>Izin</h3>
+                    <div class="count" id="permit-count">0</div>
+                </div>
+                <div class="summary-card sick-card">
+                    <h3>Sakit</h3>
+                    <div class="count" id="sick-count">0</div>
+                </div>
+                <div class="summary-card absent-card">
+                    <h3>Alfa</h3>
+                    <div class="count" id="absent-count">0</div>
+                </div>
+            </div>
+            
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Siswa</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="daily-report-body">
+                    <!-- Daily report data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Monthly Report Page -->
+        <div id="monthly-report-page" class="slide-container">
+            <div class="report-header">
+                <button class="backup-button save-backup" onclick="showSlide('home-page')">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </button>
+                <div class="date-filter">
+                    <select id="monthly-month">
+                        <option value="1">Januari</option>
+                        <option value="2">Februari</option>
+                        <option value="3">Maret</option>
+                        <option value="4">April</option>
+                        <option value="5">Mei</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">Agustus</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                    <select id="monthly-year">
+                        <!-- Years will be populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+            
+            <h2>Rekap Kehadiran Bulanan</h2>
+            
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Siswa</th>
+                        <th>Hadir</th>
+                        <th>Izin</th>
+                        <th>Sakit</th>
+                        <th>Alfa</th>
+                    </tr>
+                </thead>
+                <tbody id="monthly-report-body">
+                    <!-- Monthly report data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Success Message -->
+        <div id="success-message" class="success-message">
+            Data telah terkirim!
+        </div>
+    </div>
+
+    <script>
+        // Student data
+        const defaultStudents = [
+            "AIRA ALFANISA",
+            "ALVARO ABU RIZIQ",
+            "AZAHRA MIKAILA PUTRI",
+            "DAFFA SYADID AL GHIFARI",
+            "DAVITA SHEILA NURASYIFA",
+            "DIMAS SAID HAIDIR",
+            "DZAKIRA ASSYABIYA RAFIFA",
+            "HAYISAM NUGRAHA",
+            "HILMA SYAKILA RAHMADANI",
+            "KIRANA PUTRI SOFYAN",
+            "MEZZA RIZKI MUNANDAR",
+            "MUHAMAD IQBAL RACHMADENI",
+            "MUHAMAD JUNA",
+            "MUHAMAD RIZQI KURNIAWAN",
+            "MUHAMAD SYAHDAN",
+            "MUHAMAD WILDAN RAMDANI",
+            "MUHAMMAD AFANDI RAHMAN",
+            "MUHAMMAD SAHDAN ALMUHAIMIN",
+            "NADILA AINA ZAHRA",
+            "NAUFAL FADIL PRATAMA",
+            "NAYLA PUTRI LUTHPIANA",
+            "RAHAP",
+            "SAHLA YUSHIRA ALMAHA",
+            "SALWA TUNNISA HANIFAH",
+            "SRI WAHYUNI",
+            "UPAIRA NUR APIPAH"
+        ];
+
+        // Attendance status options
+        const statusOptions = [
+            { text: "✔️ Hadir", value: "present", color: "#C8E6C9" },
+            { text: "📄 Izin", value: "permit", color: "#FFF9C4" },
+            { text: "🤒 Sakit", value: "sick", color: "#FFE0B2" },
+            { text: "❌ Alfa", value: "absent", color: "#FFCDD2" }
+        ];
+
+        // Current attendance data
+        let attendanceData = {};
+        let allAttendanceData = {};
+        let students = [...defaultStudents];
+        
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date
+            updateDateTime();
+            
+            // Start the clock
+            setInterval(updateDateTime, 1000);
+            
+            // Load saved data from localStorage if available
+            loadFromLocalStorage();
+            
+            // Populate student cards
+            generateStudentCards();
+            
+            // Initialize date filters
+            initializeDateFilters();
+            
+            // Set up login form
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                if (username === 'lita' && password === 'kelas5') {
+                    showSlide('home-page');
+                } else {
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            });
+            
+            // Set up date change listeners
+            document.getElementById('daily-date').addEventListener('change', updateDailyReport);
+            document.getElementById('monthly-month').addEventListener('change', updateMonthlyReport);
+            document.getElementById('monthly-year').addEventListener('change', updateMonthlyReport);
+        });
+        
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const icon = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            }
+        }
+        
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', options);
+            
+            // Format time to HH:MM:SS
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('digital-clock').textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // Set current date in daily report filter
+            const dateInput = document.getElementById('daily-date');
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+        }
+        
+        // Generate student cards
+        function generateStudentCards() {
+            const container = document.getElementById('students-container');
+            container.innerHTML = '';
+            
+            students.forEach((student, index) => {
+                // Initialize attendance status
+                if (!attendanceData[student]) {
+                    attendanceData[student] = 'present';
+                }
+                
+                const status = attendanceData[student];
+                const statusOption = statusOptions.find(opt => opt.value === status);
+                
+                const card = document.createElement('div');
+                card.className = 'student-card';
+                card.innerHTML = `
+                    <div class="student-avatar">
+                        ${getInitials(student)}
+                    </div>
+                    <div class="student-name">${student}</div>
+                    <select class="attendance-status" onchange="updateAttendance('${student}', this.value)">
+                        ${statusOptions.map(opt => `
+                            <option value="${opt.value}" ${status === opt.value ? 'selected' : ''}>
+                                ${opt.text}
+                            </option>
+                        `).join('')}
+                    </select>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // Get initials from name
+        function getInitials(name) {
+            return name.split(' ')
+                .map(part => part[0])
+                .join('')
+                .substring(0, 2);
+        }
+        
+        // Update attendance status
+        function updateAttendance(student, status) {
+            attendanceData[student] = status;
+            saveToLocalStorage();
+        }
+        
+        // Mark all students as present
+        function markAllPresent() {
+            students.forEach(student => {
+                attendanceData[student] = 'present';
+            });
+            generateStudentCards();
+            saveToLocalStorage();
+        }
+        
+        // Submit attendance
+        function submitAttendance() {
+            const now = new Date();
+            const today = formatDate(now);
+            
+            // Save today's attendance
+            allAttendanceData[today] = {...attendanceData};
+            saveToLocalStorage();
+            
+            // Show success message
+            const message = document.getElementById('success-message');
+            message.textContent = 'Data kehadiran berhasil disimpan!';
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Format date to YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Show slide
+        function showSlide(slideId) {
+            document.querySelectorAll('.slide-container').forEach(slide => {
+                slide.classList.remove('active');
+            });
+            document.getElementById(slideId).classList.add('active');
+            
+            // If showing reports, update data
+            if (slideId === 'daily-report-page') {
+                updateDailyReport();
+            } else if (slideId === 'monthly-report-page') {
+                updateMonthlyReport();
+            }
+        }
+        
+        // Initialize date filters
+        function initializeDateFilters() {
+            // Set current date in daily report filter
+            const now = new Date();
+            const dateInput = document.getElementById('daily-date');
+            dateInput.value = formatDate(now);
+            
+            // Set current month in monthly report filter
+            document.getElementById('monthly-month').value = now.getMonth() + 1;
+            
+            // Initialize year dropdown (2025-2030)
+            const yearSelect = document.getElementById('monthly-year');
+            yearSelect.innerHTML = '';
+            for (let year = 2025; year <= 2030; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+            yearSelect.value = now.getFullYear();
+        }
+        
+        // Update daily report
+        function updateDailyReport() {
+            const dateKey = document.getElementById('daily-date').value;
+            
+            // Get attendance data for this date
+            const dailyData = allAttendanceData[dateKey] || {};
+            
+            const tbody = document.getElementById('daily-report-body');
+            tbody.innerHTML = '';
+            
+            let presentCount = 0;
+            let permitCount = 0;
+            let sickCount = 0;
+            let absentCount = 0;
+            
+            students.forEach((student, index) => {
+                const status = dailyData[student] || 'absent';
+                const statusOption = statusOptions.find(opt => opt.value === status);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${student}</td>
+                    <td>${statusOption.text}</td>
+                `;
+                tbody.appendChild(row);
+                
+                // Count statuses
+                if (status === 'present') presentCount++;
+                else if (status === 'permit') permitCount++;
+                else if (status === 'sick') sickCount++;
+                else if (status === 'absent') absentCount++;
+            });
+            
+            // Update counts
+            document.getElementById('present-count').textContent = presentCount;
+            document.getElementById('permit-count').textContent = permitCount;
+            document.getElementById('sick-count').textContent = sickCount;
+            document.getElementById('absent-count').textContent = absentCount;
+        }
+        
+        // Update monthly report
+        function updateMonthlyReport() {
+            const month = parseInt(document.getElementById('monthly-month').value);
+            const year = parseInt(document.getElementById('monthly-year').value);
+            
+            const monthNames = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            const monthName = monthNames[month - 1];
+            
+            // Initialize monthly data for each student
+            const monthlyData = {};
+            students.forEach(student => {
+                monthlyData[student] = {
+                    present: 0,
+                    permit: 0,
+                    sick: 0,
+                    absent: 0
+                };
+            });
+            
+            // Aggregate data for the selected month
+            Object.keys(allAttendanceData).forEach(dateKey => {
+                // Extract year and month from dateKey (format YYYY-MM-DD)
+                const dateParts = dateKey.split('-');
+                if (dateParts.length === 3) {
+                    const dataYear = parseInt(dateParts[0]);
+                    const dataMonth = parseInt(dateParts[1]);
+                    
+                    if (dataYear === year && dataMonth === month) {
+                        const dailyData = allAttendanceData[dateKey];
+                        students.forEach(student => {
+                            const status = dailyData[student] || 'absent';
+                            monthlyData[student][status]++;
+                        });
+                    }
+                }
+            });
+            
+            // Update table
+            const tbody = document.getElementById('monthly-report-body');
+            tbody.innerHTML = '';
+            
+            students.forEach((student, index) => {
+                const data = monthlyData[student];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${student}</td>
+                    <td>${data.present}</td>
+                    <td>${data.permit}</td>
+                    <td>${data.sick}</td>
+                    <td>${data.absent}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Save data to localStorage
+        function saveToLocalStorage() {
+            const data = {
+                attendanceData: attendanceData,
+                allAttendanceData: allAttendanceData,
+                students: students,
+                lastUpdate: new Date().toISOString()
+            };
+            localStorage.setItem('absenData', JSON.stringify(data));
+        }
+        
+        // Load data from localStorage
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('absenData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    attendanceData = data.attendanceData || {};
+                    allAttendanceData = data.allAttendanceData || {};
+                    students = data.students || [...defaultStudents];
+                } catch (e) {
+                    console.error("Error loading data:", e);
+                    // Use default data if loading fails
+                    attendanceData = {};
+                    allAttendanceData = {};
+                    students = [...defaultStudents];
+                }
+            } else {
+                // No saved data, use defaults
+                attendanceData = {};
+                allAttendanceData = {};
+                students = [...defaultStudents];
+            }
+        }
+        
+        // =========================
+        // BACKUP DATA FUNCTIONS
+        // =========================
+        
+        // Save backup to file
+        function saveBackup() {
+            const data = {
+                attendanceData: attendanceData,
+                allAttendanceData: allAttendanceData,
+                students: students,
+                lastUpdate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            const exportFileDefaultName = `backup-absen-sdn1pasirpogor-${dateStr}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            // Show success message
+            const message = document.getElementById('success-message');
+            message.textContent = 'Backup berhasil disimpan!';
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Load backup from file
+        function loadBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate the data structure
+                    if (data.attendanceData && data.allAttendanceData && data.students) {
+                        attendanceData = data.attendanceData;
+                        allAttendanceData = data.allAttendanceData;
+                        students = data.students;
+                        
+                        // Update the UI
+                        generateStudentCards();
+                        
+                        // Save to localStorage
+                        saveToLocalStorage();
+                        
+                        // Show success message
+                        const message = document.getElementById('success-message');
+                        message.textContent = 'Backup berhasil dipulihkan!';
+                        message.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            message.style.display = 'none';
+                        }, 3000);
+                    } else {
+                        alert("File backup tidak valid. Struktur data tidak sesuai.");
+                    }
+                } catch (e) {
+                    alert("Error membaca file backup: " + e.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset the input to allow selecting the same file again
+            input.value = '';
+        }
+        
+        // Restore default data
+        function restoreDefaultData() {
+            if (confirm("Apakah Anda yakin ingin mengembalikan data ke pengaturan awal? Semua perubahan akan dihapus.")) {
+                attendanceData = {};
+                allAttendanceData = {};
+                students = [...defaultStudents];
+                
+                // Update the UI
+                generateStudentCards();
+                
+                // Save to localStorage
+                saveToLocalStorage();
+                
+                // Show success message
+                const message = document.getElementById('success-message');
+                message.textContent = 'Data berhasil dikembalikan ke default!';
+                message.style.display = 'block';
+                
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
